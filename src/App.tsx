@@ -15,7 +15,6 @@ import { LoginPage } from './components/LoginPage';
 import { HomeDashboard } from './components/HomeDashboard';
 import { MediaDetailModal } from './components/MediaDetailModal';
 import { VideoPlayerView } from './components/VideoPlayerView';
-import { GitHubReleasesModal } from './components/GitHubReleasesModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { SubtitlesAudioHub } from './components/SubtitlesAudioHub';
 import { DualShockPromptBar } from './components/DualShockPromptBar';
@@ -42,7 +41,7 @@ export default function App() {
     if (autostart) {
       return {
         id: 'u-ps3-01',
-        name: 'PS3 Media User',
+        name: 'ps3user',
         serverUrl: 'http://192.168.1.100:8096',
         token: 'jellyfin-token-ps3',
         avatarLetter: 'P'
@@ -64,7 +63,6 @@ export default function App() {
     subIdx: number;
   } | null>(null);
 
-  const [showReleasesModal, setShowReleasesModal] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
   // Controller navigation item index
@@ -84,7 +82,7 @@ export default function App() {
           if (items && items.length > 0) setMediaItems(items);
         }
       } catch {
-        // Keeps seeded media items
+        // Keeps cached media items
       }
     }
 
@@ -99,8 +97,6 @@ export default function App() {
     if (button === 'CIRCLE') {
       if (selectedItem) {
         setSelectedItem(null);
-      } else if (showReleasesModal) {
-        setShowReleasesModal(false);
       } else if (showProfile) {
         setShowProfile(false);
       }
@@ -108,7 +104,7 @@ export default function App() {
     }
 
     if (button === 'TRIANGLE') {
-      setShowReleasesModal(prev => !prev);
+      setShowProfile(prev => !prev);
       return;
     }
 
@@ -117,8 +113,8 @@ export default function App() {
       return;
     }
 
+    const tabs = ['home', 'movies', 'tv', 'anime', 'subtitles'];
     if (button === 'L1') {
-      const tabs = ['home', 'movies', 'tv', 'subtitles'];
       const curIdx = tabs.indexOf(currentTab);
       const nextIdx = (curIdx - 1 + tabs.length) % tabs.length;
       setCurrentTab(tabs[nextIdx]);
@@ -126,7 +122,6 @@ export default function App() {
     }
 
     if (button === 'R1') {
-      const tabs = ['home', 'movies', 'tv', 'subtitles'];
       const curIdx = tabs.indexOf(currentTab);
       const nextIdx = (curIdx + 1) % tabs.length;
       setCurrentTab(tabs[nextIdx]);
@@ -138,7 +133,7 @@ export default function App() {
     } else if (button === 'RIGHT') {
       setFocusedItemIdx(prev => Math.min(mediaItems.length - 1, prev + 1));
     } else if (button === 'CROSS') {
-      if (!selectedItem && !showReleasesModal && !showProfile) {
+      if (!selectedItem && !showProfile) {
         const item = mediaItems[focusedItemIdx];
         if (item) {
           setSelectedItem(item);
@@ -173,33 +168,29 @@ export default function App() {
     setSelectedItem(null);
   };
 
-  // If user is not authenticated, render production login screen
+  // If user is not authenticated, render clean login screen
   if (!user) {
     return (
       <main className="min-h-screen bg-[#080c14] text-slate-100 flex flex-col justify-between">
-        <LoginPage
-          onSuccess={handleLoginSuccess}
-          onOpenReleases={() => setShowReleasesModal(true)}
-        />
+        <LoginPage onSuccess={handleLoginSuccess} />
         <DualShockPromptBar
           activeButton={activeButton}
           onButtonSimulate={triggerButton}
           isGamepadConnected={isConnected}
           controllerName={controllerName}
         />
-        {showReleasesModal && (
-          <GitHubReleasesModal onClose={() => setShowReleasesModal(false)} />
-        )}
       </main>
     );
   }
 
-  // Filter items for Movies or TV tabs
+  // Filter items for category tabs
   const displayedItems =
     currentTab === 'movies'
       ? mediaItems.filter(i => i.type === 'Movie')
       : currentTab === 'tv'
       ? mediaItems.filter(i => i.type === 'Series')
+      : currentTab === 'anime'
+      ? mediaItems.filter(i => i.genres.includes('Anime'))
       : mediaItems;
 
   return (
@@ -211,7 +202,6 @@ export default function App() {
         status={ps3Status}
         userName={user.name}
         onOpenProfile={() => setShowProfile(true)}
-        onOpenReleases={() => setShowReleasesModal(true)}
       />
 
       {/* Main Body */}
@@ -259,11 +249,6 @@ export default function App() {
           onClose={() => setPlayingItem(null)}
           activeButton={activeButton}
         />
-      )}
-
-      {/* GitHub Releases & PKG Installer Modal */}
-      {showReleasesModal && (
-        <GitHubReleasesModal onClose={() => setShowReleasesModal(false)} />
       )}
 
       {/* User Profile / Server Modal */}

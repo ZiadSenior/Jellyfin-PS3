@@ -7,7 +7,6 @@ interface TopBarProps {
   status: PS3SystemStatus;
   userName: string;
   onOpenProfile: () => void;
-  onOpenReleases: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -15,8 +14,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onSelectTab,
   status,
   userName,
-  onOpenProfile,
-  onOpenReleases
+  onOpenProfile
 }) => {
   return (
     <header className="sticky top-0 z-30 w-full bg-[#080c14]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-3.5">
@@ -57,18 +55,20 @@ export const TopBar: React.FC<TopBarProps> = ({
             TV Shows
           </button>
           <button
+            onClick={() => onSelectTab('anime')}
+            className={`whitespace-nowrap shrink-0 transition-colors ${
+              currentTab === 'anime' ? 'text-cyan-400 font-semibold' : 'hover:text-white'
+            }`}
+          >
+            Anime
+          </button>
+          <button
             onClick={() => onSelectTab('subtitles')}
             className={`whitespace-nowrap shrink-0 transition-colors ${
               currentTab === 'subtitles' ? 'text-cyan-400 font-semibold' : 'hover:text-white'
             }`}
           >
             Subtitles &amp; Audio
-          </button>
-          <button
-            onClick={onOpenReleases}
-            className="whitespace-nowrap shrink-0 hover:text-cyan-400 transition-colors flex items-center gap-1.5"
-          >
-            <span>Releases (.PKG)</span>
           </button>
         </nav>
 

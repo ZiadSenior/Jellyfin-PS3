@@ -9,10 +9,10 @@
 </p>
 
 <p align="center">
-  <a href="#download--github-releases"><img src="https://img.shields.io/badge/Release-v1.0.0-00a4dc?style=flat-square" alt="Release" /></a>
+  <a href="../../releases"><img src="https://img.shields.io/badge/GitHub%20Releases-v1.0.0-00a4dc?style=flat-square" alt="Releases" /></a>
   <a href="#ps3-hardware-compatibility"><img src="https://img.shields.io/badge/PS3%20Firmware-4.89%20--%204.93%20HEN%2FCFW-emerald?style=flat-square" alt="Firmware" /></a>
-  <a href="#video-decoding"><img src="https://img.shields.io/badge/Video-1080p%20AVC%20High%40L4.2-purple?style=flat-square" alt="Video" /></a>
-  <a href="#subtitles"><img src="https://img.shields.io/badge/Subtitles-SRT%20%7C%20PGS%20%7C%20ASS%20On--The--Fly-pink?style=flat-square" alt="Subtitles" /></a>
+  <a href="#video--audio-specifications"><img src="https://img.shields.io/badge/Video-1080p%20AVC%20High%40L4.2-purple?style=flat-square" alt="Video" /></a>
+  <a href="#subtitle-support"><img src="https://img.shields.io/badge/Subtitles-SRT%20%7C%20PGS%20%7C%20ASS%20On--The--Fly-pink?style=flat-square" alt="Subtitles" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=flat-square" alt="License" /></a>
 </p>
 
@@ -20,26 +20,57 @@
 
 ## Overview
 
-The **Jellyfin PS3 Client** brings modern 1080p streaming to the Sony PlayStation 3 console without sacrificing video quality or dropping frames. Built specifically around the PS3's **Cell Broadband Engine** and **RSX Reality Synthesizer** hardware limitations, this client negotiates direct-play AVC stream profiles, sanitizes heavy anime subtitle tags on-the-fly, and integrates natively with DualShock 3 controllers.
+The **Jellyfin PS3 Client** brings modern 1080p video streaming to the Sony PlayStation 3 console without dropping frames. Engineered around the hardware characteristics of the PS3's **Cell Broadband Engine** and **RSX Reality Synthesizer**, this client negotiates direct-play AVC stream profiles, sanitizes heavy anime subtitle tags on-the-fly, supports multi-track audio switching, and integrates natively with DualShock 3 controllers.
 
-### Key Highlights
+### Key Features
 
-- **1080p AVC Direct Play**: Requests H.264 High Profile Level 4.2 streams at up to 35 Mbps. Hardware-accelerated by the Cell processor with zero server-side video re-encoding required.
-- **On-The-Fly .ASS Subtitle Stripper**: Advanced SubStation Alpha (`.ass` / `.ssa`) vector formatting requires significant CPU rendering that can cause buffer stutter on the PS3. Our client strips positional, karaoke (`\k`), color, and fade tags in real time, delivering high-contrast plain text subtitles with zero frame drops.
-- **SRT & PGS Subtitles**: Complete support for SubRip (`.srt`) text tracks and Presentation Graphic Stream (`.pgs` / `.sup`) bitmap overlays extracted from Blu-ray and Matroska (`.mkv`) sources.
-- **Multi-Track External Audio**: Switch between audio streams on the fly (original master audio, Dolby Digital 5.1 AC3 passthrough via HDMI/Optical, stereo AAC, and director commentary tracks).
-- **Universal HEN / CFW Compatibility**: Works out of the box on firmware versions **4.89, 4.90, 4.91, 4.92, and the latest 4.93**.
+- **1080p AVC Direct Play**: Direct playback of H.264 High Profile Level 4.2 up to 35 Mbps. Hardware-accelerated by the Cell processor with zero server-side video transcoding required.
+- **On-The-Fly .ASS Subtitle Stripper**: Advanced SubStation Alpha (`.ass` / `.ssa`) vector formatting requires heavy CPU rendering that causes micro-stuttering on the PS3. This client strips positional, karaoke (`\k`), color, and fade tags in real time, delivering clean, high-contrast plain text subtitles with zero frame drops.
+- **SRT & PGS Subtitles**: Full support for SubRip (`.srt`) text tracks and Presentation Graphic Stream (`.pgs` / `.sup`) bitmap overlays extracted from Blu-ray and Matroska (`.mkv`) sources.
+- **Multi-Track External Audio**: Switch between audio streams on the fly (original audio master, Dolby Digital 5.1 AC3 passthrough via HDMI/Optical, stereo AAC, and audio commentaries).
+- **Universal HEN / CFW Compatibility**: Works out of the box on firmware versions **4.89, 4.90, 4.91, 4.92, and 4.93**.
 - **DualShock 3 Navigation**: Full controller mapping via standard Gamepad API with an on-screen console HUD and button prompts.
 
 ---
 
-## Download & GitHub Releases
+## GitHub Releases & Publishing Guide
 
-| File | Target | Size | Checksum (SHA-256) |
-| :--- | :--- | :--- | :--- |
-| **[`Jellyfin-PS3-v1.0.0.pkg`](https://github.com/your-username/jellyfin-ps3/releases/download/v1.0.0/Jellyfin-PS3-v1.0.0.pkg)** | PS3 HEN & CFW (4.89–4.93) | ~14.8 MB | `9a7e8b62c43d8a1103f5e927c8d9e034b12678da401f89c45a72093e2b1049c8` |
+### Automated Release (GitHub Actions)
 
-*(You can also download the `.pkg` directly from inside the app's **Releases (.PKG)** top bar menu or login page)*.
+This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/release.yml`) that automatically builds the application, packages `Jellyfin-PS3-v1.0.0.pkg`, calculates its SHA-256 checksum, and publishes it to your GitHub Releases page whenever you push a version tag:
+
+```bash
+# 1. Add your GitHub remote repository
+git remote add origin https://github.com/<your-username>/<your-repo>.git
+git branch -M main
+git push -u origin main
+
+# 2. Tag and push the v1.0.0 release
+git tag -a v1.0.0 -m "Release v1.0.0: Initial PS3 Jellyfin Client"
+git push origin v1.0.0
+```
+
+GitHub Actions will build the `.pkg` and attach it to:
+`https://github.com/<your-username>/<your-repo>/releases/tag/v1.0.0`
+
+### Manual Release (Local Build)
+
+You can also compile the package locally and upload it directly to your GitHub Releases page:
+
+```bash
+# 1. Install dependencies and build
+npm install
+npm run build
+
+# The compiled package will be in:
+# dist/Jellyfin-PS3-v1.0.0.pkg
+```
+
+1. Navigate to your GitHub repository in your browser.
+2. Click **Releases → Draft a new release**.
+3. Set the tag to `v1.0.0` and title to `Jellyfin PS3 Client v1.0.0`.
+4. Drag and drop `dist/Jellyfin-PS3-v1.0.0.pkg` into the release binaries drop zone.
+5. Click **Publish release**.
 
 ---
 
@@ -47,7 +78,7 @@ The **Jellyfin PS3 Client** brings modern 1080p streaming to the Sony PlayStatio
 
 ### Method 1: USB Flash Drive (Recommended)
 
-1. Download `Jellyfin-PS3-v1.0.0.pkg` from the Releases page.
+1. Download `Jellyfin-PS3-v1.0.0.pkg` from your repository's Releases page.
 2. Format a USB flash drive as **FAT32** (MBR partition scheme).
 3. Copy `Jellyfin-PS3-v1.0.0.pkg` to the **root** of your USB drive (e.g. `E:\Jellyfin-PS3-v1.0.0.pkg`).
 4. Insert the USB drive into your PS3's **right-most USB port** (closest to the Blu-ray drive, `/dev_usb000/`).
@@ -58,10 +89,10 @@ The **Jellyfin PS3 Client** brings modern 1080p streaming to the Sony PlayStatio
 
 ### Method 2: webMAN MOD / Browser Portal
 
-If you prefer not to install a `.pkg`, you can bookmark the hosted web client directly into the PS3 NetFront/WebKit browser:
+If you prefer to run the client without installing a package:
 1. Open the PS3 Internet Browser.
 2. Press **△ (Triangle) → File → Address**.
-3. Enter your Jellyfin PS3 URL (e.g. `http://192.168.1.100:3000`).
+3. Enter your Jellyfin PS3 URL (e.g. `http://<server-ip>:3000`).
 4. Press **START** to navigate.
 5. In the browser menu, select **Tools → Confirm Browser Close → Off** and bookmark the page.
 
@@ -69,12 +100,12 @@ If you prefer not to install a `.pkg`, you can bookmark the hosted web client di
 
 ## DualShock 3 Controller Mapping
 
-| Button | Function in Navigation | Function during 1080p Playback |
+| Button | Navigation Function | 1080p Playback Function |
 | :---: | :--- | :--- |
 | **✕ (Cross)** | Select item / Confirm | Play / Pause |
 | **○ (Circle)** | Back / Close modal | Exit player / Back to library |
 | **□ (Square)** | Jump to Subtitles & Audio | Open Audio & Subtitle Tracks Drawer |
-| **△ (Triangle)** | Open GitHub Releases / PKG Info | Toggle Stats for Nerds HUD |
+| **△ (Triangle)** | Open User Profile / Server Settings | Toggle Stats for Nerds HUD |
 | **L1** | Switch previous category | Rewind 10 seconds |
 | **R1** | Switch next category | Fast forward 30 seconds |
 | **D-Pad / Left Stick** | Navigate grid elements | Scrub timeline |
@@ -97,8 +128,8 @@ If you prefer not to install a `.pkg`, you can bookmark the hosted web client di
 - **Stereo**: AAC-LC, MP3, FLAC (downmixed to stereo 320 kbps)
 - **Multi-Track**: Dynamic stream index selection via Jellyfin Playback API
 
-### Subtitle Processing
-- **SRT (SubRip)**: Client-side parsing and rendering with contrast backing
+### Subtitle Support
+- **SRT (SubRip)**: Client-side parsing and rendering with contrast backing and timing offset sync
 - **PGS (Presentation Graphic Stream)**: Synchronized bitmap graphic overlays
 - **ASS / SSA (Advanced SubStation Alpha)**: On-the-fly tag sanitizer strips `{\k...}`, `{\pos...}`, `{\fad...}`, `{\c&H...&}`, preventing video micro-stutter
 
@@ -106,14 +137,10 @@ If you prefer not to install a `.pkg`, you can bookmark the hosted web client di
 
 ## Building from Source
 
-### Prerequisites
-- Node.js 18+ or 20+
-- npm 9+
-
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/jellyfin-ps3.git
-cd jellyfin-ps3
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
 
 # 2. Install dependencies
 npm install
@@ -128,8 +155,7 @@ npm run dev
 npm run build
 ```
 
-The compiled PS3 `.pkg` binary will be output to:
-`dist/Jellyfin-PS3-v1.0.0.pkg`
+The compiled package will be created in `dist/Jellyfin-PS3-v1.0.0.pkg`.
 
 ---
 

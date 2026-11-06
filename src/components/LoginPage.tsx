@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { authenticateJellyfin } from '../utils/jellyfinApi';
 import { JellyfinUser } from '../types/jellyfin';
-import { triggerPkgDownload, CURRENT_RELEASE_METADATA } from '../utils/pkgGenerator';
 
 interface LoginPageProps {
   onSuccess: (user: JellyfinUser) => void;
-  onOpenReleases: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({
-  onSuccess,
-  onOpenReleases
-}) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
   const [serverUrl, setServerUrl] = useState(() => {
     return localStorage.getItem('jellyfin_ps3_server') || 'http://192.168.1.100:8096';
   });
@@ -55,10 +50,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       setIsAuthenticating(false);
       setErrorMsg((err as Error).message || 'Connection failed');
     }
-  };
-
-  const handleDownloadPkg = () => {
-    triggerPkgDownload(window.location.origin, `Jellyfin-PS3-v${CURRENT_RELEASE_METADATA.version}.pkg`);
   };
 
   return (
@@ -147,7 +138,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
 
           {/* Primary Action Button */}
-          <div className="pt-2 space-y-3">
+          <div className="pt-2">
             <button
               type="submit"
               disabled={isAuthenticating}
@@ -167,34 +158,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           </div>
         </form>
 
-        {/* GitHub Releases & PKG download row */}
-        <div className="mt-8 pt-6 border-t border-slate-800/80 flex items-center justify-between gap-3 text-xs">
-          <button
-            type="button"
-            onClick={onOpenReleases}
-            className="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1.5 transition-colors"
-          >
-            <span>GitHub Releases &amp; .PKG</span>
-            <span className="font-mono text-[10px] text-slate-400">v{CURRENT_RELEASE_METADATA.version}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDownloadPkg}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700 font-medium text-[11px] transition-colors flex items-center gap-1.5"
-            title="Download PS3 .PKG installer directly"
-          >
-            <svg className="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span>Download .PKG</span>
-          </button>
-        </div>
-
         {/* Feature footnote without pills */}
-        <div className="mt-4 pt-3 border-t border-slate-800/40 text-[11px] text-slate-400 flex flex-wrap justify-between gap-y-1">
+        <div className="mt-8 pt-6 border-t border-slate-800/80 text-[11px] text-slate-400 flex flex-wrap justify-between gap-y-1">
           <div>
             <span className="text-slate-300 font-semibold">Video:</span> H.264 High@L4.2 (1080p AVC)
           </div>
