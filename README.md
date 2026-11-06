@@ -35,23 +35,24 @@ The **Jellyfin PS3 Client** brings modern 1080p video streaming to the Sony Play
 
 ## GitHub Releases & Publishing Guide
 
-### Automated Release (GitHub Actions)
+### Automated Release & Future Updates (GitHub Actions)
 
-This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/release.yml`) that automatically builds the application, packages `Jellyfin-PS3-v1.0.0.pkg`, calculates its SHA-256 checksum, and publishes it to your GitHub Releases page whenever you push a version tag:
+This repository includes an automated GitHub Actions workflow (`.github/workflows/release.yml`). Whenever you push updates to `main`, push a version tag (`v*`), or trigger **Run workflow** manually:
+1. It runs unit tests and compiles a fresh `Jellyfin-PS3-v1.0.0.pkg`.
+2. Computes the latest SHA-256 checksum.
+3. Automatically **replaces** the existing release on GitHub: updating `Jellyfin-PS3-v1.0.0.pkg`, `Jellyfin-PS3-v1.0.0.pkg.sha256`, and refreshing GitHub's **Source code (zip)** and **Source code (tar.gz)** to match the latest commit.
 
 ```bash
-# 1. Add your GitHub remote repository
-git remote add origin https://github.com/<your-username>/<your-repo>.git
-git branch -M main
-git push -u origin main
+# 1. Push updates to main (automatically rebuilds and updates release)
+git push origin main
 
-# 2. Tag and push the v1.0.0 release
+# 2. Or tag a specific release version
 git tag -a v1.0.0 -m "Release v1.0.0: Initial PS3 Jellyfin Client"
-git push origin v1.0.0
+git push --force origin v1.0.0
 ```
 
-GitHub Actions will build the `.pkg` and attach it to:
-`https://github.com/<your-username>/<your-repo>/releases/tag/v1.0.0`
+GitHub Actions will publish or replace the release at:
+`https://github.com/<your-username>/<your-repo>/releases`
 
 ### Manual Release (Local Build)
 

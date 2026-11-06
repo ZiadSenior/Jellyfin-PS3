@@ -2,6 +2,9 @@ name: Build and Release PS3 PKG
 
 on:
   push:
+    branches:
+      - main
+      - master
     tags:
       - 'v*'
   workflow_dispatch:
@@ -16,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,17 +44,33 @@ jobs:
           sha256sum Jellyfin-PS3-v1.0.0.pkg > Jellyfin-PS3-v1.0.0.pkg.sha256
           cat Jellyfin-PS3-v1.0.0.pkg.sha256
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
-        with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}
-          name: Jellyfin PS3 Client ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-          files: |
-            dist/Jellyfin-PS3-v1.0.0.pkg
-            dist/Jellyfin-PS3-v1.0.0.pkg.sha256
+      - name: Publish or Replace GitHub Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Determine release tag (use pushed tag, or default to v1.0.0 on branch push / workflow_dispatch)
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="v1.0.0"
+          fi
+
+          echo "Releasing version: $TAG (commit: ${{ github.sha }})"
+
+          # Clean up any existing release for this tag so that previous .pkg, .sha256,
+          # and GitHub's automatically generated Source code (zip) and (tar.gz) are fully replaced
+          gh release delete "$TAG" --yes --cleanup-tag || true
+
+          # Update the git tag to point to the current commit and force-push
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG" "${{ github.sha }}"
+          git push --force origin "$TAG" || true
+
+          # Create fresh GitHub Release with the newly built PKG and checksum
+          gh release create "$TAG" \
+            --title "Jellyfin PS3 Client $TAG" \
+            --target "${{ github.sha }}" \
+            --generate-notes \
+            dist/Jellyfin-PS3-v1.0.0.pkg \
+            dist/Jellyfin-PS3-v1.0.0.pkg.sha256
