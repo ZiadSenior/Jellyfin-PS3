@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbars for PS3 / 10ft TV UI */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 164, 220, 0.7);
+}
+
+/* PS3 Controller Focus Ring */
+.ps3-focus-ring:focus-visible {
+  outline: 2px solid #00a4dc;
+  outline-offset: 3px;
+  box-shadow: 0 0 15px rgba(0, 164, 220, 0.4);
+}
+
+/* Prevent unwanted mobile / controller selection */
+.user-select-none {
+  user-select: none;
+  -webkit-user-select: none;
+}

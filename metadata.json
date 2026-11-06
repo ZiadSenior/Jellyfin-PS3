@@ -1,0 +1,6 @@
+{
+  "name": "Jellyfin PS3 (HEN 4.89-4.93)",
+  "description": "High-performance 1080p Jellyfin client optimized for PlayStation 3 running Custom Firmware / HEN 4.89-4.93, with on-the-fly ASS/SRT/PGS subtitle support, multi-audio tracks, and DualShock 3 navigation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,54 @@
+name: Build and Release PS3 PKG
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Build Web Client & PS3 .PKG
+        run: npm run build
+
+      - name: Compute Checksum
+        id: checksum
+        run: |
+          cd dist
+          sha256sum Jellyfin-PS3-v1.0.0.pkg > Jellyfin-PS3-v1.0.0.pkg.sha256
+          cat Jellyfin-PS3-v1.0.0.pkg.sha256
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: Jellyfin PS3 Client ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/Jellyfin-PS3-v1.0.0.pkg
+            dist/Jellyfin-PS3-v1.0.0.pkg.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
